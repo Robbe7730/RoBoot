@@ -2,7 +2,7 @@
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
 #endif
- 
+
 /* This tutorial will only work for the 32-bit ix86 targets. */
 #if !defined(__i386__)
 #error "This kernel needs to be compiled with a ix86-elf compiler"
@@ -16,6 +16,7 @@
 #include "memory.c"
 #include "interrupts.c"
 #include "shell.c"
+#include "network.c"
 
 static inline bool are_interrupts_enabled() {
     unsigned long flags;
@@ -25,7 +26,7 @@ static inline bool are_interrupts_enabled() {
     return flags & (1 << 9);
 }
 
-void kernel_main(void) 
+void kernel_main(void)
 {
 	/* Initialize terminal interface */
 	terminal_initialize();
@@ -35,11 +36,11 @@ void kernel_main(void)
 	terminal_putchar('l');
 	terminal_putchar('l');
 	terminal_putchar('o');
- 
-    terminal_setcolor(vga_entry_color(VGA_COLOR_GREEN, VGA_COLOR_BLACK));
-    terminal_writestring(" kernel");
-    terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK));
-    terminal_writestring(" World!\n");
+
+  terminal_setcolor(vga_entry_color(VGA_COLOR_GREEN, VGA_COLOR_BLACK));
+  terminal_writestring(" kernel");
+  terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK));
+  terminal_writestring(" World!\n");
 	terminal_writestring("Newlines!\n");
 
 	char* memory_str = alloc(sizeof(char) * 7);
@@ -60,6 +61,7 @@ void kernel_main(void)
 	terminal_writestring((are_interrupts_enabled())? "Interrupts!\n": "No interrupts :(\n");
 
 	interrupt_init();
+  network_init();
 
 	for(;;) {
 		shell_step();
